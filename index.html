@@ -1,219 +1,165 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GET KEY - VHMODCHEAT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Key Free - locneem113</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2d6a61;
+            --bg: #f5f7fa;
+            --text: #333;
+            --white: #ffffff;
+            --tele-color: #2481cc;
+        }
 
-<style>
-body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:linear-gradient(135deg,#0a0f1c,#0d1b2a);
-    color:white;
-}
+        body {
+            background-color: var(--bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
 
-/* ===== HEADER ===== */
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:15px 20px;
-    background:#0b1320;
-    border-bottom:1px solid #00e5ff;
-}
+        .container { width: 100%; max-width: 450px; }
 
-.header h2{
-    margin:0;
-    color:#00e5ff;
-}
+        .card {
+            background: var(--white);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
 
-.telegram-btn{
-    padding:8px 15px;
-    border-radius:20px;
-    background:#111827;
-    border:1px solid #00e5ff;
-    color:white;
-    text-decoration:none;
-}
+        .badge {
+            background: #e6f2f0;
+            color: var(--primary);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center; gap: 5px; margin-bottom: 15px;
+        }
 
-.telegram-btn:hover{
-    background:#00e5ff;
-    color:black;
-}
+        h1 { font-size: 28px; margin: 0 0 10px 0; color: var(--text); }
+        .sub-title { color: #666; font-size: 14px; margin-bottom: 20px; }
 
-/* ===== MAIN BOX ===== */
-.container{
-    max-width:400px;
-    margin:30px auto;
-    padding:20px;
-    background:#0f172a;
-    border-radius:20px;
-    border:2px solid #00e5ff;
-    box-shadow:0 0 20px #00e5ff33;
-}
+        /* Game List */
+        .game-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; }
+        .tag {
+            background: var(--white); border: 1px solid #eee; padding: 10px 15px;
+            border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+        .tag.active { background-color: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+        .tag span { color: #999; font-weight: normal; }
+        .tag.active span { color: rgba(255, 255, 255, 0.8); }
 
-/* ===== SELECT ===== */
-select{
-    width:100%;
-    padding:12px;
-    border-radius:12px;
-    background:#111827;
-    border:2px solid #00e5ff;
-    color:white;
-    margin-bottom:20px;
-}
+        /* Buttons */
+        .btn {
+            display: block; width: 100%; padding: 15px; border-radius: 25px;
+            text-align: center; text-decoration: none; font-weight: bold;
+            margin-bottom: 10px; box-sizing: border-box; font-size: 16px; border: none; cursor: pointer;
+        }
+        .btn-main { background: var(--primary); color: white; }
+        .btn-outline { background: white; color: var(--primary); border: 1px solid var(--primary); }
 
-/* ===== BUTTON GET KEY ===== */
-.get-btn{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:12px;
-    background:linear-gradient(90deg,#00ff88,#00e5ff);
-    font-size:16px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.3s;
-}
+        /* Info Labels */
+        .info-row { display: flex; justify-content: space-between; gap: 5px; margin-top: 20px; }
+        .label { background: #f0f0f0; padding: 5px 10px; border-radius: 8px; font-size: 11px; color: #444; }
 
-.get-btn:hover{
-    transform:scale(1.05);
-    box-shadow:0 0 20px #00e5ff;
-}
+        /* Guide Card */
+        .guide-card { background: var(--white); border-radius: 25px; padding: 25px; width: 100%; box-sizing: border-box; margin-bottom: 20px;}
+        .guide-list { padding-left: 20px; color: #555; font-size: 14px; line-height: 2; }
 
-/* ===== DOWNLOAD BOX ===== */
-.download-box{
-    margin-top:25px;
-    padding:15px;
-    border-radius:15px;
-    background:#0b0f1a;
-    border:2px solid #00e5ff;
-}
+        /* Telegram Section */
+        .tele-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .tele-box {
+            background: #eef7ff;
+            border: 1px solid #cce5ff;
+            padding: 15px 10px;
+            border-radius: 15px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--tele-color);
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .tele-box i { font-size: 20px; margin-bottom: 5px; display: block; }
+        .tele-box:hover { background: var(--tele-color); color: white; transform: translateY(-3px); }
 
-.download-box h3{
-    text-align:center;
-    margin-bottom:15px;
-    color:#00e5ff;
-}
-
-.download-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:12px;
-    padding:10px;
-    border-radius:10px;
-    background:#111827;
-    border:1px solid #00e5ff;
-    transition:0.3s;
-}
-
-.download-item:hover{
-    background:#00e5ff22;
-}
-
-.download-item span{
-    color:white;
-}
-
-.download-btn{
-    padding:6px 15px;
-    border:none;
-    border-radius:8px;
-    background:#00e5ff;
-    color:black;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-.download-btn:hover{
-    background:white;
-}
-
-/* ===== FOOTER ===== */
-.footer{
-    text-align:center;
-    margin-top:20px;
-    font-size:14px;
-    color:#aaa;
-}
-</style>
+        footer { margin: 30px 0; font-size: 13px; color: #999; text-align: center; }
+    </style>
 </head>
 <body>
 
-<div class="header">
-    <h2>GET KEY</h2>
-    <a href="https://t.me/vhmodsgamechat" target="_blank" class="telegram-btn">Telegram</a>
-</div>
-
 <div class="container">
+    <div class="card">
+        <div class="badge"><i class="fas fa-bolt"></i> KEY MIỄN PHÍ</div>
+        <h1>Nhận key miễn phí</h1>
+        <p class="sub-title">Chọn game và hoàn thành nhiệm vụ để lấy Key.</p>
 
-    <h2>Lấy Key Nhanh • An Toàn</h2>
-    <p>Chọn Game Mà Bạn Muốn Lấy Key.</p>
-
-    <!-- CHỌN GAME -->
-    <select id="gameSelect">
-    <option value="https://vuotnhanh.com/Y6K4">Mod Menu FC MOBILE</option>
-    <option value="https://vuotnhanh.com/eurg">Mod Menu Liên Quân</option>
-    <option value="https://link4m.com/ZK8vJff">Mod Menu 8Ball Pool</option>
-</select>
-
-    <!-- NÚT LẤY KEY -->
-    <button class="get-btn" onclick="getKey()">Bấm để lấy key</button>
-
-    <!-- LINK TẢI -->
-    <div class="download-box">
-        <h3>📥 Link Tải Game</h3>
-
-        <div class="download-item">
-            <span>FC Mobile Quốc Tế</span>
-            <a href="https://link4m.com/Wkr5Wr" target="_blank">
-                <button class="download-btn">Tải</button>
-            </a>
+        <div class="game-tags">
+            <div class="tag" onclick="selectGame(this, '8ball')">8 BALL POOL <span>— 8BALLPOOL</span></div>
+            <div class="tag" onclick="selectGame(this, 'fc')">FC MOBILE <span>— FCMOBILE</span></div>
+            <div class="tag" onclick="selectGame(this, 'lq')">LIÊN QUÂN <span>— LIENQUAN</span></div>
         </div>
 
-        <div class="download-item">
-            <span>FC Mobile VN</span>
-            <a href="https://vuotnhanh.com/38r2" target="_blank">
-                <button class="download-btn">Tải</button>
-            </a>
-        </div>
+        <button class="btn btn-main" onclick="redirectToTask()">Nhận key miễn phí</button>
+        <a href="https://t.me/VanHiep20000" class="btn btn-outline" target="_blank">Mua key (IB Admin)</a>
 
-        <div class="download-item">
-            <span>Liên Quân 64Bit</span>
-            <a href="https://vuotnhanh.com/rTn3" target="_blank">
-                <button class="download-btn">Tải</button>
-            </a>
+        <div class="info-row">
+            <div class="label">Số lần vượt link: 3 lần</div>
+            <div class="label">Thời hạn key: 24h</div>
+            <div class="label">Thiết bị: 1</div>
         </div>
-
-        <div class="download-item">
-            <span>Liên Quân 32Bit</span>
-            <a href="https://vuotnhanh.com/NRth" target="_blank">
-                <button class="download-btn">Tải</button>
-            </a>
-        </div>
-
-        <div class="download-item">
-            <span>8 Ball Pool</span>
-            <a href="https://vuotnhanh.com/2AQE" target="_blank">
-                <button class="download-btn">Tải</button>
-            </a>
-        </div>
-
     </div>
 
-    <div class="footer">
-        © 2026 VHMODSDev • All rights reserved
+    <div class="guide-card">
+        <h2 style="font-size: 20px; margin-top: 0;">Hướng dẫn & Cộng đồng</h2>
+        <ol class="guide-list">
+            <li>Chọn Game -> Bấm Nhận Key.</li>
+            <li>Vượt link để lấy mã kích hoạt.</li>
+        </ol>
+        
+        <div class="tele-grid">
+            <a href="https://t.me/vhmodsgames" class="tele-box" target="_blank">
+                <i class="fab fa-telegram"></i> Nhóm Thông Báo
+            </a>
+            <a href="https://t.me/vhmodsgamechat" class="tele-box" target="_blank">
+                <i class="fab fa-telegram"></i> Nhóm Chat Chung
+            </a>
+        </div>
     </div>
-
 </div>
+
+<footer>Powered by <strong>Light</strong></footer>
 
 <script>
-function getKey(){
-    var link = document.getElementById("gameSelect").value;
-    window.location.href = link;
-}
+    let currentSelected = "";
+    const gameLinks = {
+        "fc": "https://vuotnhanh.com/Y6K4",
+        "lq": "https://vuotnhanh.com/eurg",
+        "8ball": "https://link4m.com/go/ZK8vJff"
+    };
+
+    function selectGame(element, gameId) {
+        document.querySelectorAll('.tag').forEach(tag => tag.classList.remove('active'));
+        element.classList.add('active');
+        currentSelected = gameId;
+    }
+
+    function redirectToTask() {
+        if (!currentSelected) {
+            alert("Vui lòng chọn 1 Game!");
+            return;
+        }
+        window.location.href = gameLinks[currentSelected];
+    }
 </script>
 
 </body>
