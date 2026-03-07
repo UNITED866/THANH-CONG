@@ -7,148 +7,335 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #2d6a61;
-            --bg: #f5f7fa;
-            --white: #ffffff;
-            --tele-color: #2481cc;
-            --dark-auth: #0a0a0a;
-            --success: #00ff88;
-            --accent: #e6f2f0;
+            --primary: #00f2ff;
+            --secondary: #7000ff;
+            --bg-dark: #050505;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
         }
 
-        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; height: 100%; width: 100%; overflow: hidden; background-color: var(--bg); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; font-family: 'Lexend', 'Segoe UI', sans-serif; background-color: var(--bg-dark); color: var(--text); height: 100%; width: 100%; overflow: hidden; }
 
-        /* --- TOAST NOTIFICATION --- */
-        #toast { position: fixed; top: 20px; right: -300px; background: var(--white); border-left: 5px solid var(--primary); padding: 15px 25px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; z-index: 100000; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        /* --- LANG SELECTOR --- */
+        .lang-picker {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 100001;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            padding: 5px 10px;
+            border-radius: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .lang-picker select {
+            background: transparent;
+            color: white;
+            border: none;
+            outline: none;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .lang-picker i { color: var(--primary); font-size: 14px; }
+
+        /* --- BACKGROUND ANIMATION --- */
+        .area { background: #000; width: 100%; height:100vh; position: fixed; top:0; left:0; z-index: -1; }
+        .circles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; margin:0; padding:0; }
+        .circles li { position: absolute; display: block; list-style: none; width: 20px; height: 20px; background: rgba(0, 242, 255, 0.1); animation: animate 25s linear infinite; bottom: -150px; border-radius: 50%; }
+        .circles li:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+        .circles li:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+        .circles li:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+        @keyframes animate { 0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; } 100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; } }
+
+        /* --- TOAST --- */
+        #toast { position: fixed; top: 20px; right: -350px; background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px); border: 1px solid var(--primary); padding: 15px 25px; border-radius: 15px; display: flex; align-items: center; gap: 10px; z-index: 100000; transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
         #toast.show { right: 20px; }
 
-        /* --- LÌ XÌ RƠI --- */
-        #lixiBox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99999; overflow: hidden; }
-        .lixi { position: absolute; top: -50px; width: 16px; height: 26px; background-color: #d40000; border: 1px solid #ffd700; border-radius: 4px; display: flex; justify-content: center; align-items: center; color: #ffd700; font-weight: bold; font-size: 9px; animation: fall linear forwards; }
-        .lixi::after { content: '福'; } 
-        @keyframes fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0.2; } }
-
         /* --- AUTH SCREEN --- */
-        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--dark-auth); display: flex; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.5s ease; }
-        .auth-card { background: #121212; border-radius: 30px; padding: 40px 20px; width: 85%; max-width: 350px; text-align: center; border: 1px solid #333; }
-        .circle-loader { width: 50px; height: 50px; border: 4px solid #1a1a1a; border-top: 4px solid var(--success); border-radius: 50%; margin: 0 auto 20px; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        #auth-screen { position: fixed; inset: 0; background: var(--bg-dark); display: flex; justify-content: center; align-items: center; z-index: 10000; transition: 0.5s ease-in-out; }
+        .auth-content { text-align: center; }
+        .auth-logo { width: 80px; height: 80px; margin: 0 auto 20px; overflow: hidden; }
+        .auth-logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
+        
+        /* --- POPUP OVERLAY --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0); backdrop-filter: blur(0px); display: none; justify-content: center; align-items: center; z-index: 20000; transition: 0.4s ease; }
+        .modal-overlay.show { background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); }
+        
+        .modal-card { background: var(--glass); border: 1px solid var(--glass-border); width: 90%; max-width: 380px; border-radius: 30px; padding: 30px; text-align: center; transform: scale(0.7); opacity: 0; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .modal-overlay.show .modal-card { transform: scale(1); opacity: 1; }
+        .modal-overlay.closing .modal-card { transform: scale(0.7); opacity: 0; }
 
-        /* --- MAIN CONTENT --- */
-        #main-content { display: none; height: 100vh; overflow-y: auto; flex-direction: column; align-items: center; padding: 20px; position: relative; z-index: 10; }
+        /* --- LOADING SPINNER --- */
+        .spinner { width: 45px; height: 45px; border: 4px solid rgba(0, 242, 255, 0.1); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .gold-tag { background: rgba(255, 77, 77, 0.15); color: #ff4d4d; padding: 8px 15px; border-radius: 12px; font-size: 11px; font-weight: 800; display: inline-block; margin-bottom: 20px; border: 1px solid rgba(255, 77, 77, 0.2); }
+        .warning-box { background: rgba(255, 255, 255, 0.03); border: 1px dashed #ff4d4d; border-radius: 15px; padding: 15px; margin: 20px 0; color: #ff6b6b; font-size: 12px; font-weight: bold; }
+
+        /* --- MAIN UI --- */
+        #main-content { display: none; height: 100vh; overflow-y: auto; flex-direction: column; align-items: center; padding: 20px; z-index: 10; transform: scale(1.1); opacity: 0; transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+        #main-content.show { display: flex; transform: scale(1); opacity: 1; }
+        
         .container { width: 100%; max-width: 450px; }
-        .card { background: var(--white); border-radius: 25px; padding: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center; border: 1px solid rgba(0,0,0,0.02); }
+        .glass-card { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 30px; padding: 25px; margin-bottom: 20px; }
+
+        .title-flex { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; color: var(--primary); margin-bottom: 20px; text-transform: uppercase; }
+        .time-pill { background: #000; border: 1px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 50px; font-size: 13px; font-weight: 900; }
+
+        .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .game-tag { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 18px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.3s; color: #aaa; text-align: center; }
+        .game-tag.active { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; border: none; transform: scale(1.05); }
+
+        .btn-premium { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #000; border: none; padding: 18px; border-radius: 20px; font-weight: 900; width: 100%; cursor: pointer; font-size: 15px; transition: 0.3s; margin-bottom: 12px; }
+        .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: #fff; padding: 15px; border-radius: 20px; width: 100%; font-weight: 700; cursor: pointer; font-size: 13px; }
         
-        .section-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; color: #333; }
-        .clock-container { background: var(--accent); color: var(--primary); padding: 6px 12px; border-radius: 10px; font-weight: bold; font-size: 13px; margin-bottom: 15px; display: inline-block; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-cancel { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 15px; border-radius: 15px; flex: 1; font-weight: 700; cursor: pointer; }
 
-        .tag { background: #f8f9fa; border: 1px solid #eee; padding: 8px 12px; border-radius: 15px; display: inline-block; margin: 4px; cursor: pointer; font-size: 12px; font-weight: 600; transition: 0.3s; }
-        .tag.active { background-color: var(--primary); color: white; border-color: var(--primary); }
+        /* --- DOWNLOAD ITEMS --- */
+        .dl-list { display: flex; flex-direction: column; gap: 12px; }
+        .dl-card { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 16px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; cursor: pointer; transition: 0.3s; }
+        .dl-card:hover { background: rgba(255,255,255,0.05); }
+        .dl-name { display: flex; align-items: center; gap: 15px; color: #fff; font-size: 14px; font-weight: 600; }
+        .dl-name i { color: var(--primary); font-size: 18px; }
+        .dl-badge { font-size: 9px; background: rgba(0, 242, 255, 0.1); color: var(--primary); padding: 4px 8px; border-radius: 8px; font-weight: 800; border: 1px solid rgba(0, 242, 255, 0.2); }
 
-        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 15px; border: none; cursor: pointer; transition: 0.3s; box-sizing: border-box; }
-        .btn-main { background: var(--primary); color: white; }
-        .btn-outline { background: white; color: var(--primary); border: 2px solid var(--primary); }
+        .social-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .social-btn { background: rgba(36, 129, 204, 0.1); border: 1px solid rgba(36, 129, 204, 0.2); padding: 15px; border-radius: 20px; text-align: center; text-decoration: none; color: #2481cc; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-        /* --- KHUNG TẢI GAME --- */
-        .download-grid { display: grid; grid-template-columns: 1fr; gap: 10px; text-align: left; }
-        .dl-item { background: #f9f9f9; padding: 12px 15px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: #444; border: 1px solid #eee; transition: 0.3s; }
-        .dl-item:hover { background: var(--accent); border-color: var(--primary); transform: translateX(5px); }
-        .dl-info { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
-        .dl-info i.game-icon { color: var(--primary); font-size: 16px; }
+        #lixiBox { position: fixed; inset: 0; pointer-events: none; z-index: 99999; }
+        .lixi { position: absolute; top: -50px; width: 15px; height: 25px; background: #d40000; border: 1px solid #ffd700; border-radius: 4px; animation: fall linear forwards; display: flex; justify-content: center; align-items: center; color: #ffd700; font-size: 8px; }
+        .lixi::after { content: '福'; }
+        @keyframes fall { 100% { transform: translateY(110vh) rotate(360deg); } }
         
-        /* Badge mới với icon download thay dấu ngoặc */
-        .dl-badge { font-size: 10px; background: #eee; padding: 3px 8px; border-radius: 6px; color: #555; display: flex; align-items: center; gap: 4px; border: 1px solid #ddd; }
-        .dl-badge i { font-size: 9px; color: var(--primary); }
-
-        .tele-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .tele-box { background: #eef7ff; border: 1px solid #cce5ff; padding: 12px; border-radius: 15px; text-align: center; text-decoration: none; color: var(--tele-color); font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .verify-tick { color: #007bff; font-size: 12px; margin-left: 3px; vertical-align: middle; }
     </style>
 </head>
-<body onclick="playMusic()">
+<body>
 
-    <div id="toast"><i class="fas fa-check-circle"></i> <span id="toast-msg"></span></div>
+    <div class="lang-picker">
+        <i class="fas fa-globe"></i>
+        <select id="langSelect" onchange="changeLanguage()">
+            <option value="vi">🇻🇳 Vietnamese</option>
+            <option value="en">🇬🇧 English</option>
+        </select>
+    </div>
+
+    <div class="area"><ul class="circles"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul></div>
+    <div id="toast"><i class="fas fa-check-circle" style="color:var(--primary)"></i> <span id="toast-msg"></span></div>
     <div id="lixiBox"></div>
 
     <div id="auth-screen">
-        <div class="auth-card">
-            <div class="circle-loader"></div>
-            <h2 style="color: white; font-size: 18px;">Good Boy</h2>
-            <button class="btn btn-main" style="background:white; color:black; margin-top:20px;" onclick="enterMain()">TRUY CẬP</button>
+        <div class="auth-content">
+            <div class="auth-logo">
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgJ7WT05MQiGEF8hJuf7ihlDYBVYGjAFI1L6QyA7lojVe8yfPhGMezvFQdGKZXgFIvcpv9wlrsN3f7vAxpAHP3TNGtLDYHCbZHOivr66v9WO2ExDQ8RgVwcdpYkfNyJ5KnXxM1uVxfI7tATU-ECZVbTfEF3jD_5c42-XAUX5AZi2VkWcTpJVOduMzVwan4/s800/1000028419.webp" alt="Logo">
+            </div>
+            <h1 style="font-size: 24px; letter-spacing: 2px; margin-bottom: 5px;">GOOD BOY</h1>
+            <p style="color: #666; font-size: 12px; margin-bottom: 40px;" data-lang="system_sec">System Premium Security</p>
+            <button class="btn-premium" style="width: 200px;" onclick="openNotice()" data-lang="access">TRUY CẬP</button>
         </div>
     </div>
 
-    <audio id="bgMusic" loop><source src="https://files.catbox.moe/jywee3.mp3" type="audio/mpeg"></audio>
+    <div id="notice-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="gold-tag"><i class="fas fa-crown"></i> <span data-lang="sys_notice">THÔNG BÁO HỆ THỐNG</span></div>
+            <div style="font-weight: 800; font-size: 14px; color: var(--primary); margin-bottom: 10px;" data-lang="reset_time">🕒 RESET KEY: 00 GIỜ MỖI NGÀY</div>
+            <p style="font-size: 13px; color: #aaa; line-height: 1.6;" data-lang="mission_text">Hoàn thành nhiệm vụ ngắn để lấy mã kích hoạt sử dụng trong 24h.</p>
+            <div class="warning-box">
+                <span data-lang="warning">⚠️ CẢNH BÁO: CHỈ 1 KEY / 1 MÁY</span><br>
+                <span style="opacity: 0.7; font-weight: 400;">VanHiep Đẹp Trai <i class="fas fa-check-circle verify-tick"></i></span>
+            </div>
+            <button class="btn-premium" onclick="enterMain()" data-lang="understand">ĐÃ HIỂU</button>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div id="confirm-content">
+                <div id="confirm-icon" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;"><i class="fas fa-question-circle"></i></div>
+                <h2 id="confirm-title" style="font-size: 18px; margin-bottom: 10px;" data-lang="confirm_title">XÁC NHẬN</h2>
+                <p id="confirm-text" style="font-size: 14px; color: #ccc; line-height: 1.5;">...</p>
+                <div class="btn-group">
+                    <button class="btn-cancel" onclick="closeConfirm()" data-lang="cancel">HỦY</button>
+                    <button class="btn-premium" style="margin-bottom:0; flex:2;" id="confirm-yes-btn" data-lang="agree">ĐỒNG Ý</button>
+                </div>
+            </div>
+            <div id="redirect-loading" style="display: none;">
+                <div class="spinner"></div>
+                <h2 style="color: var(--primary); font-size: 18px; margin: 0;" data-lang="redirecting">Đang chuyển hướng...</h2>
+                <p style="font-size: 12px; color: #666; margin-top: 10px;" data-lang="wait_moment">Vui lòng chờ trong giây lát</p>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop><source src="https://files.catbox.moe/qybk07.mp3" type="audio/mpeg"></audio>
 
     <div id="main-content">
         <div class="container">
-            <div class="card">
-                <div class="section-title"><i class="fas fa-key"></i> NHẬN KEY MIỄN PHÍ</div>
-                <div class="clock-container" id="realTime">00:00:00</div>
-                <div id="gameList">
-                    <div class="tag" onclick="selectGame(this, '8 BALL POOL')">8 BALL POOL</div>
-                    <div class="tag" onclick="selectGame(this, 'FC MOBILE')">FC MOBILE</div>
-                    <div class="tag" onclick="selectGame(this, 'LIÊN QUÂN')">LIÊN QUÂN</div>
+            <div class="glass-card" style="text-align: center;">
+                <div class="title-flex"><i class="fas fa-key"></i> <span data-lang="get_free_key">Nhận Key Miễn Phí</span></div>
+                <div style="margin-bottom: 25px;"><span class="time-pill" id="realTime">00:00:00</span></div>
+                
+                <div class="game-grid">
+                    <div class="game-tag" onclick="selectGame(this, '8 BALL POOL')">8 BALL POOL</div>
+                    <div class="game-tag" onclick="selectGame(this, 'FC MOBILE')">FC MOBILE</div>
+                    <div class="game-tag" onclick="selectGame(this, 'LIÊN QUÂN')">LIÊN QUÂN</div>
+                    <div class="game-tag" onclick="selectGame(this, 'LIÊN QUÂN IOS')">LIÊN QUÂN IOS</div>
                 </div>
-                <div class="btn-group">
-                    <button class="btn btn-main" onclick="redirectToTask()"><i class="fas fa-bolt"></i> LẤY KEY NGAY</button>
-                    <a href="https://t.me/VanHiep20000" class="btn btn-outline" target="_blank"><i class="fas fa-shopping-cart"></i> MUA KEY ADMIN</a>
+
+                <button class="btn-premium" onclick="handleGetKey()"><i class="fas fa-bolt"></i> <span data-lang="get_key_now">LẤY KEY NGAY</span></button>
+                <a href="https://t.me/VanHiep20000" style="text-decoration:none"><button class="btn-outline"><i class="fas fa-shopping-cart"></i> <span data-lang="buy_key">MUA KEY ADMIN</span></button></a>
+            </div>
+
+            <div class="glass-card">
+                <div class="title-flex"><i class="fas fa-cloud-download-alt"></i> <span data-lang="dl_mod">Download Game Mod</span></div>
+                <div class="dl-list">
+                    <div class="dl-card" onclick="handleDownload('FC MOBILE - QUỐC TẾ', 'https://link4m.com/CXMI2GE')">
+                        <div class="dl-name"><i class="fas fa-gamepad"></i> FC MOBILE</div>
+                        <span class="dl-badge" data-lang="global">QUỐC TẾ</span>
+                    </div>
+                    <div class="dl-card" onclick="handleDownload('FC MOBILE - VIỆT NAM', 'https://vuotnhanh.com/AFuP')">
+                        <div class="dl-name"><i class="fas fa-gamepad"></i> FC MOBILE</div>
+                        <span class="dl-badge" data-lang="vn">VIỆT NAM</span>
+                    </div>
+                    <div class="dl-card" onclick="handleDownload('LIÊN QUÂN - 64 BIT', 'https://vuotnhanh.com/7UsH')">
+                        <div class="dl-name"><i class="fas fa-shield-alt"></i> LIÊN QUÂN</div>
+                        <span class="dl-badge">64 BIT</span>
+                    </div>
+                    <div class="dl-card" onclick="handleDownload('LIÊN QUÂN - 32 BIT', 'https://vuotnhanh.com/q8gd')">
+                        <div class="dl-name"><i class="fas fa-shield-alt"></i> LIÊN QUÂN</div>
+                        <span class="dl-badge">32 BIT</span>
+                    </div>
+                    <div class="dl-card" onclick="handleDownload('LIÊN QUÂN IOS', 'https://vuotnhanh.com/lw8g')">
+                        <div class="dl-name"><i class="fas fa-shield-alt"></i> LIÊN QUÂN IOS</div>
+                        <span class="dl-badge">IOS</span>
+                    </div>
+                    <div class="dl-card" onclick="handleDownload('8 BALL POOL VIP', 'https://vuotnhanh.com/oxVm')">
+                        <div class="dl-name"><i class="fas fa-circle"></i> 8 BALL POOL</div>
+                        <span class="dl-badge">VIP</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="section-title"><i class="fas fa-download"></i> TẢI GAME MOD MENU KISS</div>
-                <div class="download-grid">
-                    <a href="https://vuotnhanh.com/XLpK" class="dl-item" target="_blank">
-                        <div class="dl-info">
-                            <i class="fas fa-gamepad game-icon"></i> FC MOBILE 
-                            <span class="dl-badge"><i class="fas fa-download"></i> QUỐC TẾ</span>
-                        </div>
-                        <i class="fas fa-chevron-right" style="font-size: 12px; color: #ccc;"></i>
-                    </a>
-                    <a href="https://vuotnhanh.com/AFuP" class="dl-item" target="_blank">
-                        <div class="dl-info">
-                            <i class="fas fa-gamepad game-icon"></i> FC MOBILE 
-                            <span class="dl-badge"><i class="fas fa-download"></i> VIỆT NAM</span>
-                        </div>
-                        <i class="fas fa-chevron-right" style="font-size: 12px; color: #ccc;"></i>
-                    </a>
-                    <a href="https://vuotnhanh.com/7UsH" class="dl-item" target="_blank">
-                        <div class="dl-info">
-                            <i class="fas fa-shield-alt game-icon"></i> LIÊN QUÂN 
-                            <span class="dl-badge"><i class="fas fa-download"></i> 64 BIT</span>
-                        </div>
-                        <i class="fas fa-chevron-right" style="font-size: 12px; color: #ccc;"></i>
-                    </a>
-                    <a href="https://vuotnhanh.com/q8gd" class="dl-item" target="_blank">
-                        <div class="dl-info">
-                            <i class="fas fa-shield-alt game-icon"></i> LIÊN QUÂN 
-                            <span class="dl-badge"><i class="fas fa-download"></i> 32 BIT</span>
-                        </div>
-                        <i class="fas fa-chevron-right" style="font-size: 12px; color: #ccc;"></i>
-                    </a>
-                    <a href="https://vuotnhanh.com/oxVm" class="dl-item" target="_blank">
-                        <div class="dl-info">
-                            <i class="fas fa-circle game-icon"></i> 8 BALL POOL 
-                            <span class="dl-badge"><i class="fas fa-download"></i> VIP</span>
-                        </div>
-                        <i class="fas fa-chevron-right" style="font-size: 12px; color: #ccc;"></i>
-                    </a>
-                </div>
+            <div class="social-row">
+                <a href="https://t.me/vhmodsgames" class="social-btn" target="_blank"><i class="fab fa-telegram-plane"></i> <span data-lang="news_ch">KÊNH TIN</span></a>
+                <a href="https://t.me/vhmodsgamechat" class="social-btn" target="_blank"><i class="fab fa-telegram-plane"></i> <span data-lang="chat_gr">NHÓM CHAT</span></a>
             </div>
 
-            <div class="card">
-                <div class="tele-grid">
-                    <a href="https://t.me/vhmodsgames" class="tele-box" target="_blank"><i class="fab fa-telegram"></i> Thông Báo</a>
-                    <a href="https://t.me/vhmodsgamechat" class="tele-box" target="_blank"><i class="fab fa-telegram"></i> Nhóm Chat</a>
-                </div>
-            </div>
-            <footer style="color: #999; font-size: 11px; text-align: center; margin-bottom: 20px;">Powered by <strong>VanHiep</strong></footer>
+            <footer style="text-align:center; margin: 20px 0; color: #555;">
+                POWERED BY <b>VANHIEP <i class="fas fa-crown" style="color: #ffd700; font-size: 12px;"></i> <i class="fas fa-check-circle" style="color:#007bff; font-size:10px;"></i></b>
+            </footer>
         </div>
     </div>
 
     <script>
-        function showToast(msg) {
+        const audio = document.getElementById("bgMusic");
+        const noticeModal = document.getElementById('notice-modal');
+        const confirmModal = document.getElementById('confirm-modal');
+        const mainContent = document.getElementById('main-content');
+        const authScreen = document.getElementById('auth-screen');
+        const confirmContent = document.getElementById('confirm-content');
+        const redirectLoading = document.getElementById('redirect-loading');
+
+        // --- MULTI-LANGUAGE DATA ---
+        const translations = {
+            vi: {
+                system_sec: "System Premium Security",
+                access: "TRUY CẬP",
+                sys_notice: "THÔNG BÁO HỆ THỐNG",
+                reset_time: "🕒 RESET KEY: 00 GIỜ MỖI NGÀY",
+                mission_text: "Hoàn thành nhiệm vụ ngắn để lấy mã kích hoạt sử dụng trong 24h.",
+                warning: "⚠️ CẢNH BÁO: CHỈ 1 KEY / 1 MÁY",
+                understand: "ĐÃ HIỂU",
+                confirm_title: "XÁC NHẬN",
+                cancel: "HỦY",
+                agree: "ĐỒNG Ý",
+                redirecting: "Đang chuyển hướng...",
+                wait_moment: "Vui lòng chờ trong giây lát",
+                get_free_key: "Nhận Key Miễn Phí",
+                get_key_now: "LẤY KEY NGAY",
+                buy_key: "MUA KEY ADMIN",
+                dl_mod: "Download Game Mod",
+                global: "QUỐC TẾ",
+                vn: "VIỆT NAM",
+                news_ch: "KÊNH TIN",
+                chat_gr: "NHÓM CHAT",
+                toast_select: "Đã chọn: ",
+                toast_warn_select: "Vui lòng chọn game trước!",
+                conf_get_key: "XÁC NHẬN LẤY KEY",
+                conf_get_key_desc: "Bạn muốn lấy mã kích hoạt cho game",
+                conf_dl: "XÁC NHẬN TẢI XUỐNG",
+                conf_dl_desc: "Bắt đầu tải bản mod:"
+            },
+            en: {
+                system_sec: "System Premium Security",
+                access: "ACCESS",
+                sys_notice: "SYSTEM NOTICE",
+                reset_time: "🕒 RESET KEY: 00:00 EVERY DAY",
+                mission_text: "Complete short tasks to get an activation key valid for 24h.",
+                warning: "⚠️ WARNING: ONLY 1 KEY PER DEVICE",
+                understand: "UNDERSTOOD",
+                confirm_title: "CONFIRMATION",
+                cancel: "CANCEL",
+                agree: "AGREE",
+                redirecting: "Redirecting...",
+                wait_moment: "Please wait a moment",
+                get_free_key: "Get Free Key",
+                get_key_now: "GET KEY NOW",
+                buy_key: "BUY ADMIN KEY",
+                dl_mod: "Download Game Mod",
+                global: "GLOBAL",
+                vn: "VIETNAM",
+                news_ch: "NEWS CHANNEL",
+                chat_gr: "CHAT GROUP",
+                toast_select: "Selected: ",
+                toast_warn_select: "Please select a game first!",
+                conf_get_key: "GET KEY CONFIRM",
+                conf_get_key_desc: "Do you want to get the activation key for",
+                conf_dl: "DOWNLOAD CONFIRM",
+                conf_dl_desc: "Start downloading mod:"
+            }
+        };
+
+        let currentLang = 'vi';
+
+        function changeLanguage() {
+            currentLang = document.getElementById('langSelect').value;
+            const element = document.querySelectorAll('[data-lang]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-lang');
+                if (translations[currentLang][key]) {
+                    el.innerText = translations[currentLang][key];
+                }
+            });
+        }
+       
+       function openNotice() {
+            authScreen.style.opacity = '0';
+            setTimeout(() => {
+                authScreen.style.display = 'none';
+                noticeModal.style.display = 'flex';
+                setTimeout(() => noticeModal.classList.add('show'), 10);
+            }, 500);
+        }
+    
+        function enterMain() {
+            noticeModal.classList.add('closing');
+            audio.play().catch(() => {});
+            setTimeout(() => {
+                noticeModal.style.display = 'none';
+                mainContent.style.display = 'flex';
+                setTimeout(() => mainContent.classList.add('show'), 50);
+            }, 400);
+        }
+       
+       function showToast(msg) {
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
             t.classList.add('show');
@@ -157,8 +344,9 @@
 
         function updateTime() {
             const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0') + ":" + now.getSeconds().toString().padStart(2,'0') + " - " + now.getDate().toString().padStart(2,'0') + "/" + (now.getMonth()+1).toString().padStart(2,'0') + "/" + now.getFullYear();
-            document.getElementById('realTime').innerHTML = `<i class="fas fa-clock"></i> ${timeStr}`;
+            document.getElementById('realTime').innerText = now.getHours().toString().padStart(2,'0') + ":" + 
+                                                           now.getMinutes().toString().padStart(2,'0') + ":" + 
+                                                           now.getSeconds().toString().padStart(2,'0');
         }
         setInterval(updateTime, 1000);
 
@@ -171,31 +359,68 @@
             c.appendChild(l);
             setTimeout(() => l.remove(), 6000);
         }
-        setInterval(createLixi, 500);
-
-        const audio = document.getElementById("bgMusic");
-        function enterMain() {
-            document.getElementById('auth-screen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('main-content').style.display = 'flex';
-                audio.play().catch(() => {});
-            }, 500);
-        }
+        setInterval(createLixi, 600);
 
         let currentSelected = "";
-        const gameLinks = { "FC MOBILE": "https://vuotnhanh.com/Y6K4", "LIÊN QUÂN": "https://vuotnhanh.com/eurg", "8 BALL POOL": "https://link4m.com/go/ZK8vJff" };
-
+        let targetUrl = "";
+        const gameLinks = { 
+            "FC MOBILE": "https://vuotnhanh.com/Y6K4", 
+            "LIÊN QUÂN": "https://vuotnhanh.com/eurg", 
+            "LIÊN QUÂN IOS": "https://link4m.com/0QdlYwL4", 
+            "8 BALL POOL": "https://link4m.com/go/ZK8vJff" 
+        };
+      
         function selectGame(el, name) {
-            document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.game-tag').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
             currentSelected = name;
-            showToast("Đã chọn " + name);
+            showToast(translations[currentLang].toast_select + name);
         }
 
-        function redirectToTask() {
-            if (!currentSelected) { showToast("Vui lòng chọn Game!"); return; }
-            window.location.href = gameLinks[currentSelected];
+        function closeConfirm() {
+            confirmModal.classList.add('closing');
+            setTimeout(() => {
+                confirmModal.classList.remove('show', 'closing');
+                confirmModal.style.display = 'none';
+                confirmContent.style.display = 'block';
+                redirectLoading.style.display = 'none';
+            }, 400);
+        }
+    
+        function openConfirm(title, text, url) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-text').innerHTML = text;
+            targetUrl = url;
+            confirmModal.style.display = 'flex';
+            setTimeout(() => confirmModal.classList.add('show'), 10);
+
+            document.getElementById('confirm-yes-btn').onclick = function() {
+                confirmContent.style.display = 'none';
+                redirectLoading.style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 1500);
+            };
+        }
+    
+        function handleGetKey() {
+            if (!currentSelected) {
+                showToast(translations[currentLang].toast_warn_select);
+                return;
+            }
+            openConfirm(
+                translations[currentLang].conf_get_key, 
+                `${translations[currentLang].conf_get_key_desc} <b style="color:var(--primary)">${currentSelected}</b>?`, 
+                gameLinks[currentSelected]
+            );
+        }
+
+        function handleDownload(name, url) {
+            openConfirm(
+                translations[currentLang].conf_dl, 
+                `${translations[currentLang].conf_dl_desc} <b style="color:var(--primary)">${name}</b>?`, 
+                url
+            );
         }
     </script>
 </body>
