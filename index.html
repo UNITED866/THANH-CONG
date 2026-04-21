@@ -65,8 +65,11 @@
         .bg-expired { background: #ff005022; color: #ff0050; border-color: #ff0050; }
 
         .copy-btn { background: var(--primary); color: #000; border: none; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; margin-left: 8px; }
-        .btn-plus { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--primary); color: var(--primary); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; margin-left: 5px; }
+        .btn-plus { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--primary); color: var(--primary); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .btn-del-multi { background: #ff0050; color: #fff; border: none; padding: 10px 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; display: none; font-weight: bold; }
+        
+        .add-time-box { display: flex; gap: 4px; margin-top: 5px; }
+        .small-input { width: 50px; font-size: 10px; padding: 2px 5px; border-radius: 5px; background: #000; border: 1px solid var(--primary); color: #fff; }
     </style>
 </head>
 <body onload="checkAccess()">
@@ -112,7 +115,7 @@
     </div>
 
 <script>
-    const API_URL = "https://35f236d4bb81fa10-14-247-196-235.serveousercontent.com"; // THAY LINK TẠI ĐÂY
+    const API_URL = "https://56a42165259d1a4d-14-247-196-235.serveousercontent.com"; // THAY LINK TẠI ĐÂY
     const SECRET_PASSWORD = "vhp";
 
     function checkAccess() {
@@ -151,7 +154,13 @@
                     <td style="font-weight:bold; color:var(--primary)">${isExp ? k : k.substring(0,5)+'***'} <button class="copy-btn" onclick="copyToClipboard('${k}')">COPY</button></td>
                     <td>${badge}</td>
                     <td style="font-family:monospace; font-size:11px; opacity:0.6">${keys[k].hwid || 'N/A'}</td>
-                    <td style="font-size:11px;">${date} <button class="btn-plus" onclick="addTime('${k}')">+30P</button></td>
+                    <td>
+                        <div style="font-size:11px; margin-bottom: 2px;">${date}</div>
+                        <div class="add-time-box">
+                            <input type="number" id="plusVal_${k}" class="small-input" placeholder="Phút">
+                            <button class="btn-plus" onclick="addCustomTime('${k}')">CỘNG</button>
+                        </div>
+                    </td>
                     <td><button onclick="deleteSingle('${k}')" style="background:none; border:none; color:#ff0050; cursor:pointer;">×</button></td>
                 </tr>`;
 
@@ -168,9 +177,15 @@
         document.body.removeChild(el); alert('Đã copy: ' + text);
     }
 
-    async function addTime(key) {
-        await fetch(`${API_URL}/admin/add-time?key=${key}`);
-        loadKeys();
+    async function addCustomTime(key) {
+        const input = document.getElementById(`plusVal_${key}`);
+        const mins = input.value;
+        if (!mins || mins <= 0) { alert("Nhập số phút!"); return; }
+        
+        try {
+            const res = await fetch(`${API_URL}/admin/add-time?key=${key}&mins=${mins}`);
+            if (res.ok) { alert(`Đã cộng ${mins} phút!`); loadKeys(); }
+        } catch(e) { alert("Lỗi kết nối!"); }
     }
 
     async function generateKey() {
