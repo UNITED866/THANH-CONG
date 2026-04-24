@@ -16,7 +16,6 @@
             background-image: radial-gradient(circle at 50% 50%, #101030 0%, #050510 100%);
         }
         
-        /* MÀN HÌNH KHÓA */
         #lockScreen { text-align: center; margin-top: 150px; padding: 20px; }
         #lockScreen h1 {
             color: #ff0050; font-size: 28px; text-shadow: 0 0 15px #ff0050;
@@ -27,7 +26,6 @@
             padding: 12px; border-radius: 12px; outline: none; width: 200px; text-align: center;
         }
 
-        /* CONTAINER CHÍNH */
         .container { max-width: 1000px; margin: 0 auto; display: none; }
         .glass-card {
             background: var(--card-bg); backdrop-filter: blur(15px);
@@ -37,7 +35,6 @@
         h1 { text-align: center; font-size: 22px; color: var(--primary); letter-spacing: 4px; text-transform: uppercase; }
         h2 { font-size: 15px; color: #ff0050; border-left: 4px solid #ff0050; padding-left: 10px; margin-bottom: 15px; }
 
-        /* ĐIỀU KHIỂN */
         .control-panel {
             display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
             background: rgba(255, 255, 255, 0.05); padding: 15px;
@@ -50,15 +47,11 @@
             border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s;
         }
 
-        /* BẢNG DỮ LIỆU */
         .table-container { overflow-x: auto; border-radius: 15px; }
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; white-space: nowrap; }
         th { padding: 10px; font-size: 11px; opacity: 0.5; text-align: left; text-transform: uppercase; }
         td { background: rgba(255, 255, 255, 0.04); padding: 12px; font-size: 13px; }
-        tr td:first-child { border-radius: 12px 0 0 12px; }
-        tr td:last-child { border-radius: 0 12px 12px 0; }
 
-        /* NHÃN & NÚT */
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; border: 1px solid; }
         .bg-active { background: #00ff9622; color: #00ff96; border-color: #00ff96; }
         .bg-waiting { background: #ffffff11; color: #fff; border-color: #fff; }
@@ -75,7 +68,7 @@
 <body onload="checkAccess()">
 
     <div id="lockScreen">
-        <h1>BẢNG CÓ CON CẶC MÀY VÀO LÀM GÌ</h1>
+        <h1>TRUY CẬP HỆ THỐNG</h1>
         <input type="password" id="passInput" class="lock-input" placeholder="Mật mã bí mật...">
         <button onclick="verifyPass()" class="btn-gen" style="margin-top: 15px;">XÁC MINH</button>
     </div>
@@ -101,7 +94,7 @@
                             <th>TRẠNG THÁI</th>
                             <th>HWID</th>
                             <th>HẠN DÙNG</th>
-                            <th></th>
+                            <th>HÀNH ĐỘNG</th>
                         </tr>
                     </thead>
                     <tbody id="keyData"></tbody>
@@ -109,29 +102,39 @@
             </div>
         </div>
         <div class="glass-card" id="expiredSection" style="display: none;">
-            <h2>DỰ TRỮ / HẾT HẠN</h2>
-            <div class="table-container"><table id="expiredKeyData"></table></div>
+            <h2>DỰ TRỮ / HẾT HẠN / BỊ KHÓA</h2>
+            <div class="table-container">
+                <table>
+                    <tbody id="expiredKeyData"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
 <script>
-    const API_URL = "https://678194861eb8f536-123-17-228-85.serveousercontent.com";
+    // ✅ THAY LINK SERVEO MỚI CỦA ÔNG VÀO ĐÂY
+    const API_URL = "https://23888c25c39e796e-123-17-228-85.serveousercontent.com"; 
     const SECRET_PASSWORD = "vhp";
 
+    // Hàm kiểm tra quyền truy cập khi load trang
     function checkAccess() {
         if (sessionStorage.getItem('isVHP') === 'true') {
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('adminContent').style.display = 'block';
             loadKeys();
-            setInterval(loadKeys, 10000);
+            setInterval(loadKeys, 10000); // Tự động load mỗi 10s
         }
     }
 
+    // Hàm xác minh mật khẩu
     function verifyPass() {
-        if (document.getElementById('passInput').value === SECRET_PASSWORD) {
+        const input = document.getElementById('passInput').value;
+        if (input === SECRET_PASSWORD) {
             sessionStorage.setItem('isVHP', 'true');
             location.reload();
-        } else { alert("Mày vào làm gì?"); }
+        } else { 
+            alert("Mật khẩu sai! Vui lòng nhập đúng mật khẩu của VanHiep."); 
+        }
     }
 
     async function loadKeys() {
@@ -146,46 +149,51 @@
             
             for (let k in keys) {
                 const isExp = now > keys[k].expiry;
+                const isBanned = keys[k].banned === true;
                 const date = new Date(keys[k].expiry).toLocaleString('vi-VN');
-                const badge = isExp ? '<span class="badge bg-expired">HẾT HẠN</span>' : (keys[k].hwid ? '<span class="badge bg-active">ON</span>' : '<span class="badge bg-waiting">CHỜ</span>');
                 
+                let badge = isBanned ? '<span class="badge" style="color:#ff0050; border-color:#ff0050;">ĐÃ KHÓA</span>' :
+                            (isExp ? '<span class="badge bg-expired">HẾT HẠN</span>' :
+                            (keys[k].hwid ? '<span class="badge bg-active">ON</span>' : '<span class="badge bg-waiting">CHỜ</span>'));
+
                 const row = `<tr>
                     <td><input type="checkbox" class="key-cb" value="${k}" onclick="updateCount()"></td>
-                    <td style="font-weight:bold; color:var(--primary)">${isExp ? k : k.substring(0,5)+'***'} <button class="copy-btn" onclick="copyToClipboard('${k}')">COPY</button></td>
+                    <td style="font-weight:bold; color:var(--primary)">${k} <button class="copy-btn" onclick="copyToClipboard('${k}')">COPY</button></td>
                     <td>${badge}</td>
-                    <td style="font-family:monospace; font-size:11px; opacity:0.6">${keys[k].hwid || 'N/A'}</td>
+                    <td style="font-family:monospace; font-size:11px;">${keys[k].hwid || 'N/A'}</td>
                     <td>
-                        <div style="font-size:11px; margin-bottom: 2px;">${date}</div>
+                        <div style="font-size:11px;">${date}</div>
                         <div class="add-time-box">
                             <input type="number" id="plusVal_${k}" class="small-input" placeholder="Phút">
-                            <button class="btn-plus" onclick="addCustomTime('${k}')">CỘNG</button>
+                            <button class="btn-plus" onclick="addTime('${k}', 1)">+</button>
+                            <button class="btn-plus" onclick="addTime('${k}', -1)">-</button>
+                            <button class="btn-plus" style="color:#ff0050; border-color:#ff0050;" onclick="toggleBan('${k}', ${!isBanned})">${isBanned ? 'MỞ' : 'KHÓA'}</button>
                         </div>
                     </td>
-                    <td><button onclick="deleteSingle('${k}')" style="background:none; border:none; color:#ff0050; cursor:pointer;">×</button></td>
+                    <td><button onclick="deleteSingle('${k}')" style="background:none; border:none; color:#ff0050; cursor:pointer; font-size:18px;">×</button></td>
                 </tr>`;
 
-                if (isExp) { expiredTbody.innerHTML += row; hasExp = true; }
-                else { tbody.innerHTML += row; }
+                if (isExp || isBanned) {
+                    expiredTbody.innerHTML += row;
+                    hasExp = true;
+                } else {
+                    tbody.innerHTML += row;
+                }
             }
             document.getElementById('expiredSection').style.display = hasExp ? 'block' : 'none';
-        } catch(e) { console.log("Offline"); }
+        } catch(e) { console.log("Server Offline"); }
     }
 
-    function copyToClipboard(text) {
-        const el = document.createElement('textarea'); el.value = text;
-        document.body.appendChild(el); el.select(); document.execCommand('copy');
-        document.body.removeChild(el); alert('Đã copy: ' + text);
+    async function toggleBan(key, status) {
+        await fetch(`${API_URL}/admin/toggle-ban?key=${key}&status=${status}`);
+        loadKeys();
     }
 
-    async function addCustomTime(key) {
-        const input = document.getElementById(`plusVal_${key}`);
-        const mins = input.value;
-        if (!mins || mins <= 0) { alert("Nhập số phút!"); return; }
-        
-        try {
-            const res = await fetch(`${API_URL}/admin/add-time?key=${key}&mins=${mins}`);
-            if (res.ok) { alert(`Đã cộng ${mins} phút!`); loadKeys(); }
-        } catch(e) { alert("Lỗi kết nối!"); }
+    async function addTime(key, type) {
+        const val = document.getElementById(`plusVal_${key}`).value;
+        if(!val) return alert("Nhập số phút!");
+        await fetch(`${API_URL}/admin/add-time?key=${key}&mins=${val * type}`);
+        loadKeys();
     }
 
     async function generateKey() {
@@ -195,20 +203,27 @@
         loadKeys();
     }
 
-    function toggleAll(s) { document.querySelectorAll('.key-cb').forEach(cb => cb.checked = s.checked); updateCount(); }
+    async function deleteSingle(k) {
+        if(confirm('Xóa Key này?')) {
+            await fetch(`${API_URL}/admin/delete?key=${k}`);
+            loadKeys();
+        }
+    }
+
+    function toggleAll(s) {
+        document.querySelectorAll('.key-cb').forEach(cb => cb.checked = s.checked);
+        updateCount();
+    }
+
     function updateCount() {
         const sel = document.querySelectorAll('.key-cb:checked').length;
         document.getElementById('btnDelMulti').style.display = sel > 0 ? 'block' : 'none';
         document.getElementById('countSelect').innerText = sel;
     }
 
-    async function deleteSingle(k) { if(confirm('Xóa '+k+'?')) { await fetch(`${API_URL}/admin/delete?key=${k}`); loadKeys(); } }
-    async function deleteSelected() {
-        const keys = Array.from(document.querySelectorAll('.key-cb:checked')).map(cb => cb.value);
-        if(confirm('Xóa '+keys.length+' key?')) {
-            await fetch(`${API_URL}/admin/delete-multiple`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ keys }) });
-            loadKeys(); updateCount();
-        }
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text);
+        alert('Đã copy: ' + text);
     }
 </script>
 </body>
